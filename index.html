@@ -1,0 +1,709 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Nostar — Enlève l'étoile de tes images</title>
+<link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="assets/favicon-16.png">
+<link rel="apple-touch-icon" sizes="180x180" href="assets/favicon-180.png">
+<meta name="theme-color" content="#2f7bff">
+<style>
+  :root {
+    --bg: #0a0e16;
+    --bg-2: #0f1422;
+    --panel: #141a28;
+    --panel-2: #1c2438;
+    --border: #283150;
+    --text: #eaf0fb;
+    --muted: #93a0bd;
+    --accent: #2f7bff;
+    --accent-2: #19c6ff;
+    --danger: #ff5d6c;
+    --ok: #36d399;
+    --mask: #ff3b5c;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; height: 100%; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: "Segoe UI", system-ui, -apple-system, Roboto, Arial, sans-serif;
+    display: flex; flex-direction: column; min-height: 100%;
+  }
+  a { color: var(--accent-2); }
+
+  /* ========================= LANDING ========================= */
+  .landing { display: flex; flex-direction: column; min-height: 100vh;
+    background:
+      radial-gradient(900px 540px at 12% -8%, rgba(47,123,255,.20), transparent 60%),
+      radial-gradient(800px 520px at 92% 6%, rgba(25,198,255,.14), transparent 55%),
+      var(--bg); }
+  .landing.hidden { display: none; }
+
+  .lnav { display: flex; align-items: center; gap: 12px; padding: 16px 30px; }
+  .brand { display: flex; align-items: center; gap: 11px; font-weight: 750; font-size: 20px; letter-spacing: .2px; }
+  .brand img { width: 38px; height: 38px; object-fit: contain; }
+  .brand .n2 { background: linear-gradient(90deg,#fff,#9fc6ff); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .lnav-cta { margin-left: auto; display: flex; gap: 10px; }
+
+  .ghost-btn { background: rgba(255,255,255,.04); border: 1px solid var(--border); color: var(--text);
+    border-radius: 11px; padding: 10px 16px; cursor: pointer; font: inherit; font-weight: 600; transition: .15s; }
+  .ghost-btn:hover { border-color: var(--accent); background: rgba(47,123,255,.12); }
+
+  .hero { text-align: center; padding: 40px 24px 30px; display: flex; flex-direction: column; align-items: center; }
+  .hero-logo { width: 132px; height: 132px; object-fit: contain;
+    filter: drop-shadow(0 14px 40px rgba(47,123,255,.45)); animation: float 5s ease-in-out infinite; }
+  @keyframes float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-9px)} }
+  .hero h1 { font-size: clamp(30px, 5vw, 52px); line-height: 1.08; margin: 22px 0 0; max-width: 760px; }
+  .hero h1 .grad { background: linear-gradient(90deg, var(--accent), var(--accent-2)); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .hero-sub { color: var(--muted); font-size: clamp(15px,2vw,18px); line-height: 1.6; max-width: 600px; margin: 18px 0 0; }
+  .hero-cta { display: flex; gap: 14px; margin-top: 30px; flex-wrap: wrap; justify-content: center; }
+  .btn-big { padding: 14px 26px; font-size: 16px; border-radius: 13px; }
+  .micro { color: var(--muted); font-size: 13px; margin-top: 16px; display: flex; gap: 8px; align-items: center; }
+
+  .features { max-width: 1040px; margin: 30px auto 0; padding: 24px; display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(230px,1fr)); gap: 18px; width: 100%; }
+  .feat { background: var(--panel); border: 1px solid var(--border); border-radius: 16px; padding: 22px; }
+  .feat .ic { width: 44px; height: 44px; border-radius: 12px; display: grid; place-items: center; font-size: 22px;
+    background: linear-gradient(135deg, rgba(47,123,255,.25), rgba(25,198,255,.18)); border: 1px solid var(--border); }
+  .feat h3 { margin: 14px 0 6px; font-size: 16px; }
+  .feat p { margin: 0; color: var(--muted); font-size: 14px; line-height: 1.6; }
+
+  .steps { max-width: 1040px; margin: 18px auto 0; padding: 24px; width: 100%; }
+  .steps h2 { text-align: center; font-size: 24px; margin: 0 0 26px; }
+  .steps-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px,1fr)); gap: 18px; }
+  .step { position: relative; background: var(--panel); border: 1px solid var(--border); border-radius: 16px; padding: 22px 18px; }
+  .step .num { width: 30px; height: 30px; border-radius: 9px; background: linear-gradient(135deg,var(--accent),var(--accent-2));
+    display: grid; place-items: center; font-weight: 700; font-size: 15px; }
+  .step h4 { margin: 12px 0 6px; font-size: 15px; }
+  .step p { margin: 0; color: var(--muted); font-size: 13px; line-height: 1.55; }
+
+  .lfoot { margin-top: auto; padding: 30px 24px 26px; text-align: center; color: var(--muted); font-size: 13px;
+    border-top: 1px solid var(--border); }
+  .lfoot .privacy { display: inline-flex; align-items: center; gap: 8px; background: var(--panel);
+    border: 1px solid var(--border); border-radius: 999px; padding: 8px 16px; margin-bottom: 12px; color: var(--text); }
+
+  /* ========================= APP ========================= */
+  .app { display: none; flex-direction: column; flex: 1; min-height: 0; }
+  .app.show { display: flex; }
+  header { padding: 12px 22px; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 12px;
+    background: rgba(15,20,34,.75); backdrop-filter: blur(6px); }
+  header .brand img { width: 32px; height: 32px; }
+  header .brand { font-size: 17px; }
+  .header-right { margin-left: auto; display: flex; align-items: center; gap: 10px; }
+  .user-chip { display: inline-flex; align-items: center; gap: 8px; background: var(--panel-2);
+    border: 1px solid var(--border); border-radius: 999px; padding: 5px 12px 5px 6px; font-size: 13px; }
+  .user-chip .avatar { width: 24px; height: 24px; border-radius: 50%; display: grid; place-items: center;
+    background: linear-gradient(135deg, var(--accent), var(--accent-2)); font-size: 12px; font-weight: 700; color: #fff; }
+
+  main { flex: 1; display: flex; gap: 18px; padding: 18px; min-height: 0; }
+  @media (max-width: 900px){ main { flex-direction: column; } }
+  .sidebar { width: 290px; flex: none; display: flex; flex-direction: column; gap: 14px; }
+  @media (max-width: 900px){ .sidebar { width: 100%; } }
+  .card { background: var(--panel); border: 1px solid var(--border); border-radius: 14px; padding: 14px; }
+  .card h2 { font-size: 12px; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); margin: 0 0 10px; }
+
+  .row { display: flex; gap: 8px; flex-wrap: wrap; }
+  button { font: inherit; color: var(--text); cursor: pointer; background: var(--panel-2); border: 1px solid var(--border);
+    border-radius: 10px; padding: 9px 12px; transition: .15s; display: inline-flex; align-items: center; gap: 7px; justify-content: center; }
+  button:hover { border-color: var(--accent); background: #232c45; }
+  button:disabled { opacity: .4; cursor: not-allowed; }
+  button.primary { background: linear-gradient(135deg, var(--accent), var(--accent-2)); border: none; font-weight: 650; flex: 1; color:#fff; }
+  button.primary:hover { filter: brightness(1.08); }
+  button.full { width: 100%; }
+  button.danger:hover { border-color: var(--danger); color: var(--danger); }
+  button.small { padding: 6px 10px; font-size: 12px; }
+
+  label.field { display: block; font-size: 13px; color: var(--muted); margin-bottom: 6px; }
+  input[type=range] { width: 100%; accent-color: var(--accent); }
+  .val { color: var(--text); font-variant-numeric: tabular-nums; }
+  .corners { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+
+  .stage-wrap { flex: 1; min-width: 0; display: flex; flex-direction: column; background: var(--panel);
+    border: 1px solid var(--border); border-radius: 14px; overflow: hidden; }
+  .stage { flex: 1; overflow: auto; display: grid; place-items: center; padding: 18px;
+    background:
+      linear-gradient(45deg, #11151f 25%, transparent 25%) 0 0/24px 24px,
+      linear-gradient(-45deg, #11151f 25%, transparent 25%) 0 12px/24px 24px,
+      linear-gradient(45deg, transparent 75%, #11151f 75%) 12px -12px/24px 24px,
+      linear-gradient(-45deg, transparent 75%, #11151f 75%) -12px 0/24px 24px, #161b27; }
+  .canvas-stack { position: relative; line-height: 0; box-shadow: 0 10px 40px rgba(0,0,0,.45); }
+  .canvas-stack canvas { display: block; max-width: 100%; height: auto; }
+  #maskCanvas { position: absolute; inset: 0; opacity: .5; cursor: crosshair; touch-action: none; }
+
+  .dropzone { flex: 1; margin: 18px; border: 2px dashed var(--border); border-radius: 14px; display: flex;
+    flex-direction: column; align-items: center; justify-content: center; gap: 10px; color: var(--muted); text-align: center; padding: 30px; transition: .15s; }
+  .dropzone.drag { border-color: var(--accent); background: rgba(47,123,255,.10); color: var(--text); }
+  .dropzone .big { font-size: 44px; }
+  .dropzone button { margin-top: 6px; }
+
+  .statusbar { border-top: 1px solid var(--border); padding: 9px 14px; font-size: 12px; color: var(--muted);
+    display: flex; justify-content: space-between; gap: 10px; }
+  .hint { font-size: 12px; color: var(--muted); line-height: 1.5; margin: 8px 0 0; }
+  .hint b { color: var(--text); font-weight: 600; }
+  .spinner { width: 14px; height: 14px; border: 2px solid rgba(255,255,255,.25); border-top-color: #fff; border-radius: 50%; animation: spin .7s linear infinite; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .badge { color: var(--ok); }
+  kbd { background: var(--panel-2); border: 1px solid var(--border); border-radius: 5px; padding: 1px 5px; font-size: 11px; }
+
+  /* ========================= MODALES ========================= */
+  .modal { position: fixed; inset: 0; z-index: 60; display: none; align-items: center; justify-content: center;
+    padding: 24px; background: rgba(4,7,14,.72); backdrop-filter: blur(4px); }
+  .modal.show { display: flex; }
+  .modal-box { background: var(--panel); border: 1px solid var(--border); border-radius: 18px; width: 420px;
+    max-width: 100%; max-height: 90vh; overflow: auto; box-shadow: 0 24px 70px rgba(0,0,0,.55); }
+  .modal-box.wide { width: 640px; }
+  .modal-head { display: flex; align-items: center; gap: 10px; padding: 18px 20px 6px; }
+  .modal-head img { width: 30px; height: 30px; }
+  .modal-head h3 { margin: 0; font-size: 17px; flex: 1; }
+  .modal-x { border: none; background: var(--panel-2); width: 30px; height: 30px; border-radius: 8px; padding: 0; font-size: 16px; }
+  .modal-body { padding: 8px 22px 22px; }
+
+  .auth-tabs { display: flex; gap: 6px; background: var(--panel-2); padding: 5px; border-radius: 11px; margin: 8px 0 16px; }
+  .auth-tabs .tab { flex: 1; background: transparent; border: none; color: var(--muted); padding: 9px; border-radius: 8px; cursor: pointer; font: inherit; font-weight: 600; transition: .15s; }
+  .auth-tabs .tab.active { background: var(--accent); color: #fff; }
+  .modal-body label { display: block; font-size: 13px; color: var(--muted); margin: 12px 0 6px; }
+  .modal-body input { width: 100%; background: var(--panel-2); border: 1px solid var(--border); color: var(--text);
+    border-radius: 10px; padding: 11px 12px; font: inherit; outline: none; }
+  .modal-body input:focus { border-color: var(--accent); }
+  .auth-error { color: var(--danger); font-size: 13px; min-height: 18px; margin-top: 10px; }
+  .auth-note { font-size: 12px; color: var(--muted); line-height: 1.5; margin: 14px 0 0; }
+  .auth-note b { color: var(--text); }
+
+  .gallery-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px,1fr)); gap: 14px; }
+  .gallery-empty { color: var(--muted); text-align: center; padding: 40px 10px; }
+  .gitem { border: 1px solid var(--border); border-radius: 12px; overflow: hidden; background: var(--panel-2); }
+  .gitem .thumb { width: 100%; aspect-ratio: 1; object-fit: cover; background: #11131a; cursor: pointer; display: block; }
+  .gitem .meta { padding: 8px; font-size: 11px; color: var(--muted); }
+  .gitem .acts { display: flex; gap: 6px; padding: 0 8px 8px; }
+  .gitem .acts button { flex: 1; padding: 6px; font-size: 12px; }
+
+  .toast { position: fixed; bottom: 22px; left: 50%; transform: translateX(-50%) translateY(20px); background: #11151f;
+    border: 1px solid var(--border); color: var(--text); padding: 11px 18px; border-radius: 12px; font-size: 14px;
+    box-shadow: 0 12px 40px rgba(0,0,0,.5); opacity: 0; transition: .25s; z-index: 80; pointer-events: none; }
+  .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+</style>
+</head>
+<body>
+
+<!-- ============================ LANDING ============================ -->
+<div class="landing" id="landing">
+  <nav class="lnav">
+    <div class="brand"><img src="assets/Logo%20Nostar.png" alt="Nostar"><span>No<span class="n2">star</span></span></div>
+    <div class="lnav-cta">
+      <button class="ghost-btn" id="navLogin">Connexion</button>
+      <button class="primary" style="flex:none" id="navSignup">Créer un compte</button>
+    </div>
+  </nav>
+
+  <section class="hero">
+    <img class="hero-logo" src="assets/Logo%20Nostar.png" alt="Nostar">
+    <h1>Enlève la petite <span class="grad">étoile</span> de tes images, en quelques clics.</h1>
+    <p class="hero-sub">Charge ton image, marque l'étoile, et Nostar reconstruit la zone proprement.
+       Toutes tes images corrigées sont rangées dans ton compte.</p>
+    <div class="hero-cta">
+      <button class="primary btn-big" style="flex:none" id="heroSignup">Commencer — c'est gratuit</button>
+      <button class="ghost-btn btn-big" id="heroLogin">J'ai déjà un compte</button>
+    </div>
+    <div class="micro">🔒 100 % local · aucune image envoyée sur Internet · fonctionne hors-ligne</div>
+  </section>
+
+  <section class="features">
+    <div class="feat"><div class="ic">✨</div><h3>Retrait propre</h3>
+      <p>La zone marquée est reconstruite à partir de ce qui l'entoure (texture et couleurs), pas juste floutée.</p></div>
+    <div class="feat"><div class="ic">🖼️</div><h3>Ta galerie</h3>
+      <p>Chaque compte garde ses images corrigées : ré-ouvre, retélécharge ou supprime quand tu veux.</p></div>
+    <div class="feat"><div class="ic">🔒</div><h3>100 % privé</h3>
+      <p>Tout se passe dans ton navigateur, sur ton ordinateur. Aucun serveur, aucune connexion requise.</p></div>
+  </section>
+
+  <section class="steps">
+    <h2>Comment ça marche</h2>
+    <div class="steps-grid">
+      <div class="step"><div class="num">1</div><h4>Charge l'image</h4><p>Ouvre un fichier, glisse-dépose, ou colle avec Ctrl+V.</p></div>
+      <div class="step"><div class="num">2</div><h4>Marque l'étoile</h4><p>Peins par-dessus avec le pinceau, ou choisis un coin en un clic.</p></div>
+      <div class="step"><div class="num">3</div><h4>Retire-la</h4><p>Nostar reconstruit la zone à partir des pixels voisins.</p></div>
+      <div class="step"><div class="num">4</div><h4>Garde le résultat</h4><p>Enregistre dans ta galerie et/ou télécharge en PNG.</p></div>
+    </div>
+  </section>
+
+  <footer class="lfoot">
+    <div class="privacy">🔒 Tes comptes et images restent sur cet ordinateur (stockage local du navigateur).</div><br>
+    <span>Nostar · outil d'édition d'images 100 % local. Le « compte » sert à organiser tes images localement — ce n'est pas une sécurité en ligne.</span>
+  </footer>
+</div>
+
+<!-- ============================ APP ============================ -->
+<div class="app" id="app">
+  <header>
+    <div class="brand"><img src="assets/Logo%20Nostar.png" alt="Nostar"><span>No<span class="n2">star</span></span></div>
+    <div class="header-right">
+      <button id="galleryBtn">🖼️ Mes images <span id="galleryCount" class="val"></span></button>
+      <div class="user-chip"><span class="avatar" id="userAvatar">?</span><span id="userName">—</span></div>
+      <button id="logoutBtn" class="small">Déconnexion</button>
+    </div>
+  </header>
+
+  <main>
+    <aside class="sidebar">
+      <div class="card">
+        <h2>1 · Image</h2>
+        <div class="row"><button class="full" id="btnOpen">📂 Ouvrir une image</button></div>
+        <input type="file" id="fileInput" accept="image/*" hidden>
+        <p class="hint">Tu peux aussi <b>glisser-déposer</b> une image, ou la <b>coller</b> avec <kbd>Ctrl</kbd>+<kbd>V</kbd>.</p>
+      </div>
+
+      <div class="card" id="toolsCard" style="display:none">
+        <h2>2 · Marquer l'étoile</h2>
+        <p class="hint" style="margin-top:0">Peins en rouge sur l'étoile à enlever.</p>
+        <label class="field" style="margin-top:12px">Taille du pinceau : <span class="val" id="brushVal">28</span> px</label>
+        <input type="range" id="brushSize" min="4" max="200" value="28">
+        <label class="field" style="margin-top:14px">Zoom : <span class="val" id="zoomVal">100</span> %</label>
+        <input type="range" id="zoom" min="20" max="400" value="100">
+        <p class="hint" style="margin-top:12px"><b>Sélection rapide d'un coin</b> (l'étoile est souvent en bas) :</p>
+        <div class="corners" style="margin-top:8px">
+          <button data-corner="tl">↖ Haut gauche</button>
+          <button data-corner="tr">↗ Haut droite</button>
+          <button data-corner="bl">↙ Bas gauche</button>
+          <button data-corner="br">↘ Bas droite</button>
+        </div>
+        <div class="row" style="margin-top:8px">
+          <button class="full danger" id="clearMask">✖ Effacer la sélection</button>
+        </div>
+      </div>
+
+      <div class="card" id="actionCard" style="display:none">
+        <h2>3 · Retirer & enregistrer</h2>
+        <div class="row" style="margin-bottom:8px"><button class="primary" id="btnRemove">✨ Retirer l'étoile</button></div>
+        <div class="row" style="margin-bottom:8px">
+          <button id="btnUndo" style="flex:1" disabled>↶ Annuler</button>
+          <button id="btnReset" style="flex:1" class="danger">⟲ Recommencer</button>
+        </div>
+        <div class="row" style="margin-bottom:8px"><button class="full" id="btnSave">💾 Enregistrer dans ma galerie</button></div>
+        <div class="row"><button class="full" id="btnDownload">⬇️ Télécharger le résultat (PNG)</button></div>
+        <p class="hint">Astuce : si une trace reste, repasse le pinceau dessus et reclique « Retirer ».</p>
+      </div>
+    </aside>
+
+    <section class="stage-wrap">
+      <div class="dropzone" id="dropzone">
+        <div class="big">🖼️</div>
+        <div>Glisse ton image ici</div>
+        <div style="font-size:12px">ou</div>
+        <button id="btnOpen2">Choisir un fichier</button>
+      </div>
+      <div class="stage" id="stage" style="display:none">
+        <div class="canvas-stack" id="stack">
+          <canvas id="imageCanvas"></canvas>
+          <canvas id="maskCanvas"></canvas>
+        </div>
+      </div>
+      <div class="statusbar"><span id="status">Aucune image chargée.</span><span id="dims"></span></div>
+    </section>
+  </main>
+</div>
+
+<!-- ============================ MODALE AUTH ============================ -->
+<div class="modal" id="authModal">
+  <div class="modal-box">
+    <div class="modal-head"><img src="assets/Logo%20Nostar.png" alt=""><h3>Bienvenue sur Nostar</h3><button class="modal-x" data-close>✕</button></div>
+    <div class="modal-body">
+      <div class="auth-tabs">
+        <button class="tab active" data-tab="login">Connexion</button>
+        <button class="tab" data-tab="signup">Inscription</button>
+      </div>
+      <form id="authForm" autocomplete="off">
+        <div id="usernameField" style="display:none">
+          <label for="authUser">Nom d'utilisateur</label>
+          <input id="authUser" type="text" placeholder="Ton pseudo" autocomplete="off">
+        </div>
+        <label for="authEmail">Adresse email</label>
+        <input id="authEmail" type="email" placeholder="ton@email.com" autocomplete="username">
+        <label for="authPass">Mot de passe</label>
+        <input id="authPass" type="password" placeholder="••••••••" autocomplete="current-password">
+        <div class="auth-error" id="authError"></div>
+        <button type="submit" class="primary full" id="authSubmit" style="margin-top:6px">Se connecter</button>
+      </form>
+      <p class="auth-note">🔒 Tes identifiants et images restent <b>sur cet ordinateur</b>. Rien n'est envoyé sur Internet — n'utilise pas un mot de passe important.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ============================ MODALE GALERIE ============================ -->
+<div class="modal" id="galleryModal">
+  <div class="modal-box wide">
+    <div class="modal-head"><h3>🖼️ Mes images corrigées</h3><button class="modal-x" data-close>✕</button></div>
+    <div class="modal-body"><div id="galleryGrid"></div></div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+"use strict";
+const $ = (id) => document.getElementById(id);
+
+/* =====================================================================
+   STOCKAGE — utilisateurs (localStorage) + images (IndexedDB)
+   ===================================================================== */
+const USERS_KEY = "nostar_users";
+const SESSION_KEY = "nostar_session";
+let currentUser = null;          // { email, username }
+
+function loadUsers(){ try { return JSON.parse(localStorage.getItem(USERS_KEY)) || {}; } catch(e){ return {}; } }
+function saveUsers(u){ localStorage.setItem(USERS_KEY, JSON.stringify(u)); }
+function hex(buf){ return [...new Uint8Array(buf)].map(b=>b.toString(16).padStart(2,"0")).join(""); }
+function randSalt(){ const a=new Uint8Array(16); crypto.getRandomValues(a); return hex(a); }
+function cyrb53(str, seed=0){ let h1=0xdeadbeef^seed, h2=0x41c6ce57^seed;
+  for(let i=0;i<str.length;i++){ const ch=str.charCodeAt(i); h1=Math.imul(h1^ch,2654435761); h2=Math.imul(h2^ch,1597334677); }
+  h1=Math.imul(h1^(h1>>>16),2246822507)^Math.imul(h2^(h2>>>13),3266489909);
+  h2=Math.imul(h2^(h2>>>16),2246822507)^Math.imul(h1^(h1>>>13),3266489909);
+  return (4294967296*(2097151&h2)+(h1>>>0)).toString(16); }
+async function hashPassword(pw, salt){
+  try {
+    const enc=new TextEncoder();
+    const km=await crypto.subtle.importKey("raw", enc.encode(pw), {name:"PBKDF2"}, false, ["deriveBits"]);
+    const bits=await crypto.subtle.deriveBits({name:"PBKDF2", salt:enc.encode(salt), iterations:120000, hash:"SHA-256"}, km, 256);
+    return "pbkdf2$"+hex(bits);
+  } catch(e){ return "cyrb$"+cyrb53(pw+"::"+salt); }
+}
+
+let _dbp=null;
+function db(){ if(_dbp) return _dbp;
+  _dbp=new Promise((res,rej)=>{ const r=indexedDB.open("nostar_db",1);
+    r.onupgradeneeded=()=>{ const d=r.result; if(!d.objectStoreNames.contains("images")){ const os=d.createObjectStore("images",{keyPath:"id",autoIncrement:true}); os.createIndex("user","user",{unique:false}); } };
+    r.onsuccess=()=>res(r.result); r.onerror=()=>rej(r.error); });
+  return _dbp; }
+async function dbSave(rec){ const d=await db(); return new Promise((res,rej)=>{ const t=d.transaction("images","readwrite"); t.objectStore("images").add(rec); t.oncomplete=()=>res(); t.onerror=()=>rej(t.error); }); }
+async function dbList(user){ const d=await db(); return new Promise((res,rej)=>{ const out=[]; const idx=d.transaction("images").objectStore("images").index("user"); const cur=idx.openCursor(IDBKeyRange.only(user)); cur.onsuccess=e=>{ const c=e.target.result; if(c){ out.push(c.value); c.continue(); } else { out.sort((a,b)=>b.created-a.created); res(out); } }; cur.onerror=()=>rej(cur.error); }); }
+async function dbDelete(id){ const d=await db(); return new Promise((res,rej)=>{ const t=d.transaction("images","readwrite"); t.objectStore("images").delete(id); t.oncomplete=()=>res(); t.onerror=()=>rej(t.error); }); }
+async function dbCount(user){ try { return (await dbList(user)).length; } catch(e){ return 0; } }
+
+/* =====================================================================
+   AUTHENTIFICATION
+   ===================================================================== */
+let authMode="login";
+function openAuth(mode){ setAuthMode(mode); $("authError").textContent=""; $("authModal").classList.add("show"); }
+function setAuthMode(m){
+  authMode=m;
+  document.querySelectorAll(".auth-tabs .tab").forEach(t=>t.classList.toggle("active",t.dataset.tab===m));
+  $("usernameField").style.display = (m==="signup") ? "block" : "none";
+  $("authSubmit").textContent = (m==="login") ? "Se connecter" : "Créer mon compte";
+  $("authPass").setAttribute("autocomplete", m==="login"?"current-password":"new-password");
+}
+document.querySelectorAll(".auth-tabs .tab").forEach(t=> t.onclick=()=>{ setAuthMode(t.dataset.tab); $("authError").textContent=""; });
+
+$("navLogin").onclick = $("heroLogin").onclick = ()=> openAuth("login");
+$("navSignup").onclick = $("heroSignup").onclick = ()=> openAuth("signup");
+
+function validEmail(e){ return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e); }
+
+$("authForm").addEventListener("submit", async (e)=>{
+  e.preventDefault();
+  const err=$("authError"); err.textContent="";
+  const email=$("authEmail").value.trim().toLowerCase();
+  const pw=$("authPass").value;
+  const username=$("authUser").value.trim();
+  if(!validEmail(email)){ err.textContent="Adresse email invalide."; return; }
+  if(pw.length<4){ err.textContent="Mot de passe trop court (4 caractères min)."; return; }
+  const users=loadUsers();
+
+  if(authMode==="signup"){
+    if(username.length<2){ err.textContent="Nom d'utilisateur trop court (2 caractères min)."; return; }
+    if(users[email]){ err.textContent="Un compte existe déjà avec cet email. Choisis « Connexion »."; return; }
+    const salt=randSalt();
+    users[email]={ email, username, salt, hash:await hashPassword(pw,salt), created:Date.now() };
+    saveUsers(users);
+    enterApp(users[email]); toast("Compte créé. Bienvenue "+username+" 👋");
+  } else {
+    const u=users[email];
+    if(!u){ err.textContent="Aucun compte avec cet email. Crée-le via « Inscription »."; return; }
+    if(await hashPassword(pw,u.salt)!==u.hash){ err.textContent="Mot de passe incorrect."; return; }
+    enterApp(u); toast("Bon retour "+u.username+" 👋");
+  }
+});
+
+async function enterApp(user){
+  currentUser=user;
+  localStorage.setItem(SESSION_KEY, user.email);
+  $("authModal").classList.remove("show");
+  $("landing").classList.add("hidden");
+  $("app").classList.add("show");
+  $("userName").textContent=user.username;
+  $("userAvatar").textContent=(user.username[0]||"?").toUpperCase();
+  $("authPass").value=""; $("authUser").value=""; $("authEmail").value="";
+  refreshGalleryCount();
+}
+$("logoutBtn").onclick=()=>{
+  localStorage.removeItem(SESSION_KEY); currentUser=null;
+  $("app").classList.remove("show"); $("landing").classList.remove("hidden"); doReset();
+};
+(function restore(){ const s=localStorage.getItem(SESSION_KEY); const u=s && loadUsers()[s]; if(u) enterApp(u); })();
+
+/* =====================================================================
+   MODALES
+   ===================================================================== */
+function openModal(id){ $(id).classList.add("show"); }
+function closeModal(id){ $(id).classList.remove("show"); }
+document.querySelectorAll("[data-close]").forEach(b=> b.onclick=()=> b.closest(".modal").classList.remove("show"));
+document.querySelectorAll(".modal").forEach(m=> m.addEventListener("click", e=>{ if(e.target===m) m.classList.remove("show"); }));
+
+async function refreshGalleryCount(){ const n=await dbCount(currentUser.email); $("galleryCount").textContent=n?"("+n+")":""; }
+$("galleryBtn").onclick=openGallery;
+async function openGallery(){
+  openModal("galleryModal");
+  const grid=$("galleryGrid"); grid.className=""; grid.innerHTML='<p class="gallery-empty">Chargement…</p>';
+  let items=[];
+  try { items=await dbList(currentUser.email); } catch(e){ grid.innerHTML='<p class="gallery-empty">Stockage indisponible dans ce navigateur.</p>'; return; }
+  if(!items.length){ grid.innerHTML='<p class="gallery-empty">Aucune image enregistrée pour l\'instant.<br>Corrige une image puis clique « 💾 Enregistrer dans ma galerie ».</p>'; return; }
+  grid.className="gallery-grid"; grid.innerHTML="";
+  for(const it of items){
+    const cell=document.createElement("div"); cell.className="gitem";
+    const date=new Date(it.created).toLocaleString("fr-FR",{dateStyle:"medium",timeStyle:"short"});
+    cell.innerHTML=`<img class="thumb" src="${it.thumb}" title="Ouvrir dans l'éditeur">
+      <div class="meta">${date}</div>
+      <div class="acts"><button class="dl">⬇️</button><button class="del danger">🗑️</button></div>`;
+    cell.querySelector(".thumb").onclick=()=>{ loadFromDataURL(it.full); closeModal("galleryModal"); };
+    cell.querySelector(".dl").onclick=()=> downloadDataURL(it.full,"nostar-image.png");
+    cell.querySelector(".del").onclick=async()=>{ await dbDelete(it.id); refreshGalleryCount(); openGallery(); };
+    grid.appendChild(cell);
+  }
+}
+
+/* =====================================================================
+   ÉDITEUR
+   ===================================================================== */
+const imageCanvas=$("imageCanvas"), maskCanvas=$("maskCanvas");
+const ictx=imageCanvas.getContext("2d",{willReadFrequently:true});
+const mctx=maskCanvas.getContext("2d",{willReadFrequently:true});
+let hasImage=false, brushSize=28, drawing=false, lastPt=null;
+let undoStack=[]; const MAX_UNDO=8;
+
+function loadFile(file){ if(!file||!file.type.startsWith("image/"))return;
+  const url=URL.createObjectURL(file); const img=new Image();
+  img.onload=()=>{ setupImage(img); URL.revokeObjectURL(url); };
+  img.onerror=()=>{ setStatus("Impossible de lire cette image."); URL.revokeObjectURL(url); };
+  img.src=url; }
+function loadFromDataURL(d){ const img=new Image(); img.onload=()=>setupImage(img); img.src=d; }
+
+function setupImage(img){
+  imageCanvas.width=maskCanvas.width=img.naturalWidth||img.width;
+  imageCanvas.height=maskCanvas.height=img.naturalHeight||img.height;
+  ictx.clearRect(0,0,imageCanvas.width,imageCanvas.height); ictx.drawImage(img,0,0);
+  mctx.clearRect(0,0,maskCanvas.width,maskCanvas.height);
+  undoStack=[]; hasImage=true;
+  $("dropzone").style.display="none"; $("stage").style.display="flex";
+  $("toolsCard").style.display=$("actionCard").style.display="block";
+  applyZoom(100); $("zoom").value=100; $("zoomVal").textContent=100;
+  $("dims").textContent=`${imageCanvas.width} × ${imageCanvas.height} px`;
+  setStatus("Image chargée. Peins sur l'étoile, ou choisis un coin.");
+  updateUndoBtn();
+}
+function applyZoom(pct){ const w=imageCanvas.width*pct/100; $("stack").style.width=w+"px";
+  imageCanvas.style.width=maskCanvas.style.width=w+"px"; imageCanvas.style.height=maskCanvas.style.height="auto"; }
+
+function eventToCanvas(e){ const r=maskCanvas.getBoundingClientRect();
+  return { x:(e.clientX-r.left)/r.width*maskCanvas.width, y:(e.clientY-r.top)/r.height*maskCanvas.height }; }
+function maskColor(){ return getComputedStyle(document.documentElement).getPropertyValue("--mask").trim()||"#ff3b5c"; }
+function stroke(a,b){
+  mctx.globalCompositeOperation="source-over";
+  mctx.strokeStyle=mctx.fillStyle=maskColor();
+  mctx.lineCap=mctx.lineJoin="round"; mctx.lineWidth=brushSize;
+  if(!b||(a.x===b.x&&a.y===b.y)){ mctx.beginPath(); mctx.arc(a.x,a.y,brushSize/2,0,Math.PI*2); mctx.fill(); }
+  else { mctx.beginPath(); mctx.moveTo(a.x,a.y); mctx.lineTo(b.x,b.y); mctx.stroke(); }
+}
+maskCanvas.addEventListener("pointerdown",(e)=>{ if(!hasImage)return; maskCanvas.setPointerCapture(e.pointerId); drawing=true; lastPt=eventToCanvas(e); stroke(lastPt,null); });
+maskCanvas.addEventListener("pointermove",(e)=>{ if(!drawing)return; const p=eventToCanvas(e); stroke(lastPt,p); lastPt=p; });
+window.addEventListener("pointerup",()=>{ drawing=false; lastPt=null; });
+
+function selectCorner(which){
+  const w=maskCanvas.width,h=maskCanvas.height;
+  const size=Math.round(Math.min(w,h)*0.13), m=Math.round(Math.min(w,h)*0.012);
+  let x=m,y=m; if(which.includes("r"))x=w-size-m; if(which.includes("b"))y=h-size-m;
+  mctx.globalCompositeOperation="source-over"; mctx.fillStyle=maskColor(); mctx.fillRect(x,y,size,size);
+  setStatus("Coin sélectionné. Ajuste au pinceau si besoin, puis clique « Retirer l'étoile ».");
+}
+
+/* ---------------- Masque ---------------- */
+function getMaskArray(){
+  const d=mctx.getImageData(0,0,maskCanvas.width,maskCanvas.height).data;
+  const n=maskCanvas.width*maskCanvas.height, mask=new Uint8Array(n);
+  for(let i=0;i<n;i++) mask[i]=d[i*4+3]>16?1:0; return mask;
+}
+function dilate(mask,w,h,r){ let cur=mask;
+  for(let pass=0;pass<r;pass++){ const out=new Uint8Array(cur.length);
+    for(let y=0;y<h;y++)for(let x=0;x<w;x++){ const i=y*w+x;
+      if(cur[i]){out[i]=1;continue;}
+      if((x>0&&cur[i-1])||(x<w-1&&cur[i+1])||(y>0&&cur[i-w])||(y<h-1&&cur[i+w])) out[i]=1; }
+    cur=out; }
+  return cur; }
+
+/* ---------------- Inpainting par patchs (exemplar / Criminisi simplifié) ----------------
+   Reconstruit la zone en recopiant les meilleurs morceaux d'image alentour :
+   conserve textures et dégradés bien mieux qu'un simple flou.                          */
+function inpaintExemplar(data,W,H,mask){
+  const N=W*H;
+  const r=new Float32Array(N),g=new Float32Array(N),b=new Float32Array(N);
+  for(let i=0;i<N;i++){ const k=i*4; r[i]=data[k]; g[i]=data[k+1]; b[i]=data[k+2]; }
+  const filled=new Uint8Array(N); for(let i=0;i<N;i++) filled[i]=mask[i]?0:1;
+  const origFilled=filled.slice();
+  const conf=new Float32Array(N); for(let i=0;i<N;i++) conf[i]=filled[i]?1:0;
+
+  let minX=W,minY=H,maxX=-1,maxY=-1,holeCount=0;
+  for(let y=0;y<H;y++)for(let x=0;x<W;x++){ if(mask[y*W+x]){ holeCount++; if(x<minX)minX=x; if(x>maxX)maxX=x; if(y<minY)minY=y; if(y>maxY)maxY=y; } }
+  if(!holeCount) return false;
+  const holeW=maxX-minX+1, holeH=maxY-minY+1, holeMax=Math.max(holeW,holeH);
+
+  const PR=Math.max(3,Math.min(6,Math.round(holeMax/14)+3));
+  const margin=Math.min(220,Math.max(PR*4+10,Math.round(holeMax*1.15)));
+  const sx0=Math.max(0,minX-margin), sy0=Math.max(0,minY-margin);
+  const sx1=Math.min(W-1,maxX+margin), sy1=Math.min(H-1,maxY+margin);
+  const stride=((sx1-sx0)*(sy1-sy0)>52000)?2:1;
+
+  const valid=[];
+  for(let qy=Math.max(PR,sy0); qy<=Math.min(H-1-PR,sy1); qy+=stride){
+    for(let qx=Math.max(PR,sx0); qx<=Math.min(W-1-PR,sx1); qx+=stride){
+      let ok=true;
+      for(let dy=-PR;dy<=PR&&ok;dy++){ const base=(qy+dy)*W+qx; for(let dx=-PR;dx<=PR;dx++){ if(!origFilled[base+dx]){ok=false;break;} } }
+      if(ok) valid.push(qy*W+qx);
+    }
+  }
+  if(valid.length<8) return false;
+
+  const lum=(i)=>0.299*r[i]+0.587*g[i]+0.114*b[i];
+  const fminX=Math.max(0,minX-1),fminY=Math.max(0,minY-1),fmaxX=Math.min(W-1,maxX+1),fmaxY=Math.min(H-1,maxY+1);
+  let remaining=holeCount, guard=holeCount*4+2000;
+
+  while(remaining>0 && guard-->0){
+    let bestPr=-1,bestI=-1,bestC=0;
+    for(let y=fminY;y<=fmaxY;y++){ const row=y*W;
+      for(let x=fminX;x<=fmaxX;x++){ const i=row+x; if(filled[i])continue;
+        if(!((x>0&&filled[i-1])||(x<W-1&&filled[i+1])||(y>0&&filled[i-W])||(y<H-1&&filled[i+W]))) continue;
+        let cs=0,cn=0;
+        for(let dy=-PR;dy<=PR;dy++){ const yy=y+dy; if(yy<0||yy>=H)continue; const base=yy*W;
+          for(let dx=-PR;dx<=PR;dx++){ const xx=x+dx; if(xx<0||xx>=W)continue; cs+=conf[base+xx]; cn++; } }
+        const C=cn?cs/cn:0;
+        const li=(x>0&&filled[i-1])?i-1:i, ri=(x<W-1&&filled[i+1])?i+1:i;
+        const ui=(y>0&&filled[i-W])?i-W:i, di=(y<H-1&&filled[i+W])?i+W:i;
+        const gx=lum(ri)-lum(li), gy=lum(di)-lum(ui);
+        const mag=Math.sqrt(gx*gx+gy*gy)/255;
+        const pr=C*(0.04+mag);
+        if(pr>bestPr){ bestPr=pr; bestI=i; bestC=C; }
+      }
+    }
+    if(bestI<0) break;
+    const cx=bestI%W, cy=(bestI/W)|0;
+
+    let bestSSD=Infinity,bestQ=-1;
+    for(let v=0;v<valid.length;v++){
+      const q=valid[v], qx=q%W, qy=(q/W)|0;
+      let ssd=0, brk=false;
+      for(let dy=-PR;dy<=PR;dy++){ const ty=cy+dy; if(ty<0||ty>=H)continue;
+        const tbase=ty*W, sbase=(qy+dy)*W;
+        for(let dx=-PR;dx<=PR;dx++){ const tx=cx+dx; if(tx<0||tx>=W)continue;
+          const ti=tbase+tx; if(!filled[ti])continue;
+          const si=sbase+qx+dx;
+          const dr=r[ti]-r[si], dg=g[ti]-g[si], db=b[ti]-b[si];
+          ssd+=dr*dr+dg*dg+db*db;
+          if(ssd>=bestSSD){ brk=true; break; }
+        }
+        if(brk) break;
+      }
+      if(!brk && ssd<bestSSD){ bestSSD=ssd; bestQ=q; }
+    }
+    if(bestQ<0){ filled[bestI]=1; conf[bestI]=bestC; remaining--; continue; }
+    const qx=bestQ%W, qy=(bestQ/W)|0;
+    for(let dy=-PR;dy<=PR;dy++){ const ty=cy+dy; if(ty<0||ty>=H)continue;
+      const tbase=ty*W, sbase=(qy+dy)*W;
+      for(let dx=-PR;dx<=PR;dx++){ const tx=cx+dx; if(tx<0||tx>=W)continue;
+        const ti=tbase+tx; if(filled[ti])continue;
+        const si=sbase+qx+dx;
+        r[ti]=r[si]; g[ti]=g[si]; b[ti]=b[si]; filled[ti]=1; conf[ti]=bestC; remaining--;
+      }
+    }
+  }
+  for(let i=0;i<N;i++){ if(mask[i]){ const k=i*4; data[k]=r[i]; data[k+1]=g[i]; data[k+2]=b[i]; data[k+3]=255; } }
+  return true;
+}
+
+/* Repli : diffusion (lisse) si pas assez de matière autour pour les patchs */
+function inpaintDiffusion(data,W,H,mask){
+  let minX=W,minY=H,maxX=-1,maxY=-1;
+  for(let y=0;y<H;y++)for(let x=0;x<W;x++) if(mask[y*W+x]){ if(x<minX)minX=x;if(x>maxX)maxX=x;if(y<minY)minY=y;if(y>maxY)maxY=y; }
+  if(maxX<0) return;
+  const pad=4; minX=Math.max(0,minX-pad);minY=Math.max(0,minY-pad);maxX=Math.min(W-1,maxX+pad);maxY=Math.min(H-1,maxY+pad);
+  const bw=maxX-minX+1,bh=maxY-minY+1,Nn=bw*bh;
+  const R=new Float32Array(Nn),G=new Float32Array(Nn),B=new Float32Array(Nn),M=new Uint8Array(Nn);
+  for(let j=0;j<bh;j++)for(let i=0;i<bw;i++){ const gp=(minY+j)*W+(minX+i),p=j*bw+i,k=gp*4; R[p]=data[k];G[p]=data[k+1];B[p]=data[k+2];M[p]=mask[gp]; }
+  let sr=0,sg=0,sb=0,sc=0; for(let p=0;p<Nn;p++) if(!M[p]){sr+=R[p];sg+=G[p];sb+=B[p];sc++;}
+  if(sc){sr/=sc;sg/=sc;sb/=sc;} for(let p=0;p<Nn;p++) if(M[p]){R[p]=sr;G[p]=sg;B[p]=sb;}
+  const iters=Math.min(700,Math.max(80,Math.round(2.4*Math.max(bw,bh)))), idx=(x,y)=>y*bw+x;
+  for(let it=0;it<iters;it++){ const fwd=(it&1)===0,xs=fwd?0:bw-1,xe=fwd?bw:-1,dx=fwd?1:-1,ys=fwd?0:bh-1,ye=fwd?bh:-1,dy=fwd?1:-1;
+    for(let y=ys;y!==ye;y+=dy)for(let x=xs;x!==xe;x+=dx){ const p=idx(x,y); if(!M[p])continue;
+      const l=x>0?p-1:p,rr=x<bw-1?p+1:p,u=y>0?p-bw:p,d2=y<bh-1?p+bw:p;
+      R[p]=(R[l]+R[rr]+R[u]+R[d2])*0.25; G[p]=(G[l]+G[rr]+G[u]+G[d2])*0.25; B[p]=(B[l]+B[rr]+B[u]+B[d2])*0.25; } }
+  for(let j=0;j<bh;j++)for(let i=0;i<bw;i++){ const p=j*bw+i; if(!M[p])continue; const k=((minY+j)*W+(minX+i))*4; data[k]=R[p];data[k+1]=G[p];data[k+2]=B[p];data[k+3]=255; }
+}
+
+function inpaint(){
+  const w=imageCanvas.width,h=imageCanvas.height;
+  let mask=getMaskArray(); let count=0; for(let i=0;i<mask.length;i++)count+=mask[i];
+  if(!count){ setStatus("Aucune zone marquée. Peins d'abord sur l'étoile."); return false; }
+  mask=dilate(mask,w,h,2);
+  const img=ictx.getImageData(0,0,w,h), data=img.data;
+  let ok=false; try { ok=inpaintExemplar(data,w,h,mask); } catch(e){ ok=false; }
+  if(!ok) inpaintDiffusion(data,w,h,mask);
+  ictx.putImageData(img,0,0); mctx.clearRect(0,0,w,h); return true;
+}
+
+/* ---------------- Divers ---------------- */
+function pushUndo(){ undoStack.push(ictx.getImageData(0,0,imageCanvas.width,imageCanvas.height)); if(undoStack.length>MAX_UNDO)undoStack.shift(); updateUndoBtn(); }
+function updateUndoBtn(){ $("btnUndo").disabled=undoStack.length===0; }
+function setStatus(t){ $("status").innerHTML=t; }
+function makeThumb(max){ const w=imageCanvas.width,h=imageCanvas.height,s=Math.min(1,max/Math.max(w,h));
+  const c=document.createElement("canvas"); c.width=Math.max(1,Math.round(w*s)); c.height=Math.max(1,Math.round(h*s));
+  c.getContext("2d").drawImage(imageCanvas,0,0,c.width,c.height); return c.toDataURL("image/jpeg",0.82); }
+function downloadDataURL(url,name){ const a=document.createElement("a"); a.href=url; a.download=name; a.click(); }
+
+/* ---------------- Boutons ---------------- */
+$("btnOpen").onclick=$("btnOpen2").onclick=()=> $("fileInput").click();
+$("fileInput").onchange=(e)=> loadFile(e.target.files[0]);
+$("brushSize").oninput=(e)=>{ brushSize=+e.target.value; $("brushVal").textContent=brushSize; };
+$("zoom").oninput=(e)=>{ $("zoomVal").textContent=e.target.value; applyZoom(+e.target.value); };
+document.querySelectorAll("[data-corner]").forEach(b=> b.onclick=()=> selectCorner(b.dataset.corner));
+$("clearMask").onclick=()=>{ mctx.clearRect(0,0,maskCanvas.width,maskCanvas.height); setStatus("Sélection effacée."); };
+
+$("btnRemove").onclick=()=>{ if(!hasImage)return;
+  const btn=$("btnRemove"); btn.disabled=true; btn.innerHTML='<span class="spinner"></span> Traitement…'; setStatus("Reconstruction de la zone…");
+  setTimeout(()=>{ pushUndo(); const ok=inpaint(); if(!ok)undoStack.pop(); updateUndoBtn();
+    btn.disabled=false; btn.innerHTML="✨ Retirer l'étoile";
+    if(ok) setStatus('<span class="badge">✔ Étoile retirée.</span> Vérifie, puis enregistre ou télécharge.'); }, 30); };
+$("btnUndo").onclick=()=>{ if(!undoStack.length)return; ictx.putImageData(undoStack.pop(),0,0); mctx.clearRect(0,0,maskCanvas.width,maskCanvas.height); updateUndoBtn(); setStatus("Dernière action annulée."); };
+
+function doReset(){ hasImage=false; undoStack=[]; $("dropzone").style.display="flex"; $("stage").style.display="none";
+  $("toolsCard").style.display=$("actionCard").style.display="none"; $("dims").textContent=""; setStatus("Aucune image chargée."); }
+$("btnReset").onclick=doReset;
+
+$("btnSave").onclick=async()=>{ if(!hasImage){ toast("Charge d'abord une image."); return; }
+  try { await dbSave({ user:currentUser.email, full:imageCanvas.toDataURL("image/png"), thumb:makeThumb(240), created:Date.now() });
+    await refreshGalleryCount(); toast("✔ Image enregistrée dans ta galerie");
+    setStatus('<span class="badge">✔ Enregistrée dans « Mes images ».</span>'); }
+  catch(e){ toast("Échec de l'enregistrement (stockage indisponible)."); } };
+$("btnDownload").onclick=()=>{ imageCanvas.toBlob((blob)=>{ const u=URL.createObjectURL(blob); downloadDataURL(u,"nostar-image.png"); URL.revokeObjectURL(u); setStatus("Image téléchargée ✔"); },"image/png"); };
+
+/* ---------------- Glisser-déposer / coller ---------------- */
+const dz=$("dropzone");
+["dragenter","dragover"].forEach(ev=> dz.addEventListener(ev,(e)=>{ e.preventDefault(); dz.classList.add("drag"); }));
+["dragleave","drop"].forEach(ev=> dz.addEventListener(ev,(e)=>{ e.preventDefault(); dz.classList.remove("drag"); }));
+dz.addEventListener("drop",(e)=> loadFile(e.dataTransfer.files[0]));
+window.addEventListener("dragover",(e)=> e.preventDefault());
+window.addEventListener("drop",(e)=>{ e.preventDefault(); if(currentUser && !hasImage && e.dataTransfer.files[0]) loadFile(e.dataTransfer.files[0]); });
+window.addEventListener("paste",(e)=>{ if(!currentUser)return; const it=[...(e.clipboardData?.items||[])].find(i=>i.type.startsWith("image/")); if(it) loadFile(it.getAsFile()); });
+
+/* ---------------- Toast ---------------- */
+let toastTimer=null;
+function toast(msg){ const t=$("toast"); t.textContent=msg; t.classList.add("show"); clearTimeout(toastTimer); toastTimer=setTimeout(()=>t.classList.remove("show"),2600); }
+</script>
+</body>
+</html>
